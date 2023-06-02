@@ -1,0 +1,19 @@
+{
+  "name": "chat-app-socketio",
+  "version": "1.0.0",
+  "description": "Simple chat application",
+  "main": "app.js",
+  "scripts": {
+    "test": "app"
+  },
+  "author": "Sainul_abid",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "hbs": "^4.2.0",
+    "socket.io": "^4.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
