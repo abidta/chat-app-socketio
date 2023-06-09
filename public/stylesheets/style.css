@@ -1,0 +1,82 @@
+.center {
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  margin: auto;
+  text-align: center;
+}
+
+#name-form {
+  padding: 15px 0 0;
+  margin-top: 10px;
+  width: 50%;
+}
+
+.input-field {
+  font-family: inherit;
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: #000000;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+.input-field::-moz-placeholder {
+  color: transparent;
+}
+.input-field::placeholder {
+  color: transparent;
+}
+.input-field:-moz-placeholder-shown ~ .input-label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+.input-field:placeholder-shown ~ .input-label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+
+.input-label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #9b9b9b;
+}
+
+.input-field:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  -o-border-image: linear-gradient(to right, #11998e, #38ef7d);
+     border-image: linear-gradient(to right, #11998e, #38ef7d);
+  border-image-slice: 1;
+}
+.input-field:focus ~ .input-label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #11998e;
+  font-weight: 700;
+}
+.submit-btn{
+  height: 30px;
+  width: 100px;
+  background: #333;
+  border: none;
+  padding: 0 1rem;
+  margin: 1.5rem 0.5rem;
+  border-radius: 3px;
+  outline: none;
+  color: #fff;
+}
+/*# sourceMappingURL=style.css.map */
