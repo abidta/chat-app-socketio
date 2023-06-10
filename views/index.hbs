@@ -56,9 +56,9 @@
       padding: 0.5rem 1rem;
     }
 
-    #messages>li:nth-child(odd) {
-      background: #efefef;
-    }
+  /*  #messages>li:nth-child(odd) {
+      background: #fd0000;
+    }*/
   </style>
 </head>
 
@@ -82,6 +82,8 @@
     var form = document.getElementById('form');
     var input = document.getElementById('input');
     var user = document.getElementById('name')
+    var randomColor = Math.floor(Math.random()*16777215).toString(16);
+    
 
     document.getElementById('name-form').addEventListener('submit', (e) => {
       e.preventDefault()
@@ -106,16 +108,20 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (input.value) {
-        socket.emit('chat message', input.value);
+        socket.emit('chat message', input.value,randomColor);
         input.value = '';
       }
     });
 
-    socket.on('chat message', function (msg) {
-      console.log(msg.id)
+    socket.on('chat message', function ({name,msg,color}) {
       var item = document.createElement('li');
-      item.textContent = msg;
+      var msgElemnt= document.createElement('span')
+      item.textContent = name;
+      msgElemnt.textContent= ' : ' +msg
+      msgElemnt.style.color='black'
+      item.style.color='#'+color
       messages.appendChild(item);
+      item.appendChild(msgElemnt)
       window.scrollTo(0, document.body.scrollHeight);
     });
   </script>

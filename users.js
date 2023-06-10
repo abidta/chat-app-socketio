@@ -13,7 +13,15 @@ function addUser(id, name) {
 
 const getUser = (id) => {
   let user = users.find((user) => user.id == id);
-  console.log(users, "get");
   return user;
 };
-module.exports = { addUser, getUser };
+
+const deleteUser=(id)=>{
+ let index= users.findIndex(user=>user.id==id)
+ 
+ if (index!=-1) {
+  console.log(index);
+  users.splice(index,1)
+ }
+}
+module.exports = { addUser, getUser, deleteUser };

@@ -3,7 +3,7 @@ const http = require("http");
 const path = require("path");
 const { Server } = require("socket.io");
 const indexRouter = require("./routes/index");
-const { addUser, getUser } = require("./users");
+const { addUser, getUser , deleteUser } = require("./users");
 
 const app = express();
 const server = http.createServer(app);
@@ -21,21 +21,19 @@ io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("login", (username, callback) => {
     console.log(username);
-    let { user, error } = addUser(socket.id, username);
+    let {  error } = addUser(socket.id, username);
     if (error) {
-      callback(error);
+      return callback(error);
     }
-    console.log(user);
     callback();
   });
-  socket.on("chat message", (msg) => {
+  socket.on("chat message", (msg,color) => {
     let user = getUser(socket.id);
-    console.log(user);
-    io.emit("chat message", `${user.name}:  ${msg}`);
-    console.log("message: " + msg);
+    io.emit("chat message", {name:user.name,msg,color});
   });
   socket.on("disconnect", () => {
     console.log("user disconnected");
+    deleteUser(socket.id)
   });
 });
 
