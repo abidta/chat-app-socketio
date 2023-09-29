@@ -12,14 +12,16 @@
   </style>
 </head>
 <body>
+  <p id="isUser">{{user}}</p>
   <section id="msg-sec">
     <div class="container">
       <ul id="messages"></ul>
     </div>
   </section>
+  <button id="logout-btn" class="logout">Logout</button>
   <form id="name-form" class="center" action="">
     <input id="name" minlength="3" maxlength="10" name="name" placeholder="Enter your name" class="input-field"
-      type="text">
+      type="text" autocomplete="on">
     <label for="name" class="input-label">Enter your name</label>
     <p id="error-name"></p>
     <button type="submit" class="submit-btn">Submit</button>
@@ -39,7 +41,18 @@
     var input = document.getElementById('input');
     var user = document.getElementById('name')
     var randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    var logoutBtn = document.getElementById('logout-btn')
 
+    fetch("/get-session").then((res) => res.json()).then((isSession) => {
+      if (isSession) {
+        console.log(isSession, "session")
+        form.style.display = 'flex'
+        document.getElementById('name-form').style.display = 'none'
+        logoutBtn.style.display = 'flex'
+      }
+    }).catch((err) => {
+      console.log(err)
+    })
     document.getElementById('name-form').addEventListener('submit', (e) => {
       e.preventDefault()
       console.log(user)
@@ -50,6 +63,7 @@
             console.log('cb success')
             form.style.display = 'flex'
             document.getElementById('name-form').style.display = 'none'
+            logoutBtn.style.display = 'flex'
           }
           else {
             console.log(err)
@@ -59,6 +73,17 @@
         user.value = ''
       }
     })
+    logoutBtn.addEventListener('click', async (e) => {
+      await fetch("/logout", {
+        method: "POST",
+        redirect: "follow",
+        headers: { "Content-Type": "application/json" }
+      }).then((res) => {
+        if (res.redirected) {
+          location.href = "/"
+        }
+      })
+    })
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -67,7 +92,6 @@
         input.value = '';
       }
     });
-
     socket.on('chat message', function ({ name, msg, color }) {
       var item = document.createElement('li');
       var msgElemnt = document.createElement('span')
