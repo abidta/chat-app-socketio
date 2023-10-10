@@ -1,37 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { deleteUser } = require("../users");
+const { index } = require("../controllers/indexController");
+const { logout, getSession } = require("../controllers/authController");
 
-router.get("/", (req, res, next) => {
-  let username;
-  if (req.session.user) {
-    username = req.session.user.name;
-  }
-  res.render("index", { username: username });
-});
-router.get("/get-session", (req, res) => {
-  if (req.session.user) {
-    res.json(req.session.user.name);
-    return;
-  }
-  res.json(null);
-});
-router.post("/logout", (req, res) => {
-  if (!req.session.user) {
-    res.json("login first");
-    return;
-  }
-  let userId = req.session.user.userId;
-  req.session.destroy((err) => {
-    console.log(err);
-    if (!err) {
-      deleteUser(userId);
-      res.redirect("/");
-      return;
-    }
-    return res.json("Something wrong");
-  });
-});
+router.route("/").get(index);
+router.route("/get-session").get(getSession);
+router.route("/logout").post(logout);
 //for testing..
 router.get("/api", (req, res) => {
   res.send("hello world");

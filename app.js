@@ -35,6 +35,7 @@ io.engine.use(sessionMiddleware);
 
 io.on("connection", (socket) => {
   let req = socket.request;
+  
   console.log("a user connected");
   socket.use((event, next) => {
     if (req.session.user && event[0] === "login") {
@@ -55,12 +56,13 @@ io.on("connection", (socket) => {
     req.session.user = user;
     req.session.save();
     console.log(req.session.user.name + "  logged");
+    socket.join("room1")
     callback();
   });
   socket.on("chat message", async (msg, color) => {
     let userData = await getUser(req.session.user.id);
     try {
-      io.emit("chat message", { name: userData.name, msg, color });
+      io.to("room1").emit("chat message", { name: userData.name, msg, color });
     } catch (err) {
       console.log(err);
     }
