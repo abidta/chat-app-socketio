@@ -6,13 +6,23 @@ const { Server } = require("socket.io");
 const session = require("express-session");
 const { randomBytes } = require("crypto");
 const Redis = require("ioredis");
-const redisClient = new Redis(process.env.REDIS_URI);
+const redisClient = new Redis({
+  port:process.env.REDIS_PORT,
+  host:process.env.REDIS_HOST,
+  password:process.env.REDIS_PASS,
+});
 const indexRouter = require("./routes/index");
 const { addUser, getUser } = require("./users");
-
 const { RedisMessageStore } = require("./messageStore");
 const messageStore = new RedisMessageStore(redisClient);
 
+redisClient.on("error", (e) => {
+  console.log(e.message, "err");
+  redisClient.disconnect();
+});
+redisClient.on("end", (e) => {
+  console.log(e);
+});
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -64,8 +74,14 @@ io.on("connection", (socket) => {
     req.session.save();
     console.log(req.session.user.name + "  logged");
     socket.join("room1");
-    let allMessages = await messageStore.findAllMessage();
-    callback((err = null), allMessages);
+    messageStore
+      .findAllMessage()
+      .then((allMessages) => {
+        callback((err = null), allMessages);
+      })
+      .catch((err) => {
+        callback(err.message);
+      });
   });
   socket.on("chat message", async (msg, color) => {
     if (req.session.user) {
