@@ -6,6 +6,18 @@ var user = document.getElementById("name");
 var randomColor = Math.floor(Math.random() * 16777215).toString(16);
 var logoutBtn = document.getElementById("logout-btn");
 
+const createElement = (name, msg, color) => {
+  var item = document.createElement("li");
+  var msgElemnt = document.createElement("span");
+  item.textContent = name;
+  msgElemnt.textContent = " : " + msg;
+  msgElemnt.style.color = "black";
+  item.style.color = "#" + color;
+  messages.appendChild(item);
+  item.appendChild(msgElemnt);
+  window.scrollTo(0, document.body.scrollHeight);
+};
+
 fetch("/get-session")
   .then((res) => res.json())
   .then((isSession) => {
@@ -24,12 +36,17 @@ document.getElementById("name-form").addEventListener("submit", (e) => {
   console.log(user);
   console.log(socket.id);
   if (user.value) {
-    socket.emit("login", user.value, (err) => {
+    socket.emit("login", user.value, (err, messages) => {
       if (!err) {
         console.log("cb success");
         form.style.display = "flex";
         document.getElementById("name-form").style.display = "none";
         logoutBtn.style.display = "flex";
+
+        messages.forEach((element) => {
+          let msg = JSON.parse(element);
+          createElement(msg.from, msg.value, 454545);
+        });
       } else {
         console.log(err);
         document.getElementById("error-name").innerHTML = err;
@@ -58,13 +75,5 @@ form.addEventListener("submit", function (e) {
   }
 });
 socket.on("chat message", function ({ name, msg, color }) {
-  var item = document.createElement("li");
-  var msgElemnt = document.createElement("span");
-  item.textContent = name;
-  msgElemnt.textContent = " : " + msg;
-  msgElemnt.style.color = "black";
-  item.style.color = "#" + color;
-  messages.appendChild(item);
-  item.appendChild(msgElemnt);
-  window.scrollTo(0, document.body.scrollHeight);
+  createElement(name, msg, color);
 });
