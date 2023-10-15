@@ -6,18 +6,33 @@ const { Server } = require("socket.io");
 const session = require("express-session");
 const { randomBytes } = require("crypto");
 const Redis = require("ioredis");
-const redisClient = new Redis({
-  port:process.env.REDIS_PORT,
-  host:process.env.REDIS_HOST,
-  username:process.env.REDIS_USERNAME,
-  password:process.env.REDIS_PASS,
-  // tls:{},
-});
+const RedisStore = require("connect-redis").default
+
 const indexRouter = require("./routes/index");
 const { addUser, getUser } = require("./users");
 const { RedisMessageStore } = require("./messageStore");
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+const port = process.env.PORT || 3000;
+const TTL_SESS = 1 * 24 * 60 * 60
+let user = {};
+
+const redisClient = new Redis({
+  port: process.env.REDIS_PORT,
+  host: process.env.REDIS_HOST,
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASS,
+  // tls:{},
+})
 const messageStore = new RedisMessageStore(redisClient);
 
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "sess:",
+  ttl:TTL_SESS
+});
 redisClient.on("error", (e) => {
   console.log(e.message, "err");
   redisClient.disconnect();
@@ -25,21 +40,17 @@ redisClient.on("error", (e) => {
 redisClient.on("end", (e) => {
   console.log(e);
 });
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-const port = process.env.PORT || 3000;
 
 const sessionMiddleware = session({
+  store: redisStore,
   secret: process.env.SESSION_SECRET,
-  resave: true,
+  resave: false,
   saveUninitialized: true,
   cookie: {
     httpOnly: true,
   },
 });
 
-let user = {};
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
@@ -53,6 +64,7 @@ io.engine.use(sessionMiddleware);
 
 io.on("connection", (socket) => {
   let req = socket.request;
+  console.log(req.session);
 
   console.log("a user connected");
   socket.use((event, next) => {
@@ -87,17 +99,17 @@ io.on("connection", (socket) => {
   });
   socket.on("chat message", async (msg, color) => {
     if (req.session.user) {
-      console.log("kl");
-      let userData = await getUser(req.session.user.id);
-      console.log(userData);
+      console.log(req.session.user,"kl");
+      //let userData = await getUser(req.session.user.id);
+      //console.log(userData);
       const message = {
-        from: userData.name,
+        from: req.session.user.name,
         value: msg,
       };
       try {
         socket.join("room1");
         io.to("room1").emit("chat message", {
-          name: userData.name,
+          name: req.session.user.name,
           msg,
           color,
         });
