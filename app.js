@@ -11,7 +11,7 @@ const redisClient = new Redis({
   host:process.env.REDIS_HOST,
   username:process.env.REDIS_USERNAME,
   password:process.env.REDIS_PASS,
-  tls:{},
+  // tls:{},
 });
 const indexRouter = require("./routes/index");
 const { addUser, getUser } = require("./users");
