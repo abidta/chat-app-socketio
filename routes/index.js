@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { index } = require("../controllers/indexController");
+const { homePage, getAllMessages } = require("../controllers/indexController");
 const { logout, getSession } = require("../controllers/authController");
 
-router.route("/").get(index);
+router.route("/").get(homePage);
+router.route("/get-messages").get(getAllMessages);
 router.route("/get-session").get(getSession);
 router.route("/logout").post(logout);
 //for testing..

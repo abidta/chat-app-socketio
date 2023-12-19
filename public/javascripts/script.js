@@ -74,6 +74,23 @@ form.addEventListener("submit", function (e) {
     input.value = "";
   }
 });
+window.addEventListener("DOMContentLoaded", () => {
+  fetch("/get-messages")
+    .then((res) => {
+      if (res.status === 200) {
+        return res.json();
+      }
+    })
+    .then((messages) => {  
+      if (messages) {
+        console.log('fecth done with messages');
+        messages.forEach((element) => {
+          let msg = JSON.parse(element);
+          createElement(msg.from, msg.value, 454545);
+        });
+      }
+    });
+});
 socket.on("chat message", function ({ name, msg, color }) {
   createElement(name, msg, color);
 });
